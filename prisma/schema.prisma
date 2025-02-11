@@ -33,4 +33,5 @@ model Post {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   ratings       Rating[]  // Relación con Rating
+  avgRating     Decimal  @default(0.0)
 }
