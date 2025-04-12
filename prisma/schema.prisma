@@ -26,7 +26,7 @@ model Post {
   titulo        String   @db.VarChar(80) // Límite de 80 caracteres
   descripcion   String   @db.VarChar(255)
   img           String   @db.VarChar(500)
-  contenido     String
+  contenido     String   @db.MediumText
   categoria     String   @db.VarChar(100)
   subcategoria  String   @db.VarChar(100)
   lenguaje      String?  @db.VarChar(50)
@@ -35,3 +35,5 @@ model Post {
   ratings       Rating[]  // Relación con Rating
   avgRating     Decimal  @default(0.0)
 }
+
+

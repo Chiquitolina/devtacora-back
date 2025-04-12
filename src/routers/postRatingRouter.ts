@@ -24,7 +24,8 @@ export const postRatingRouter = t.router({
 
         // 3️⃣ Calcular el nuevo promedio
         const avgRating =
-          ratings.reduce((sum: any, r: { rating: any; }) => sum + r.rating, 0) / ratings.length;
+          ratings.reduce((sum: any, r: { rating: any }) => sum + r.rating, 0) /
+          ratings.length;
 
         // 4️⃣ Guardar el avgRating en el Post
         await ctx.prisma.post.update({
@@ -67,7 +68,8 @@ export const postRatingRouter = t.router({
 
         // Calcular el promedio de rating del post
         const averageRating =
-          ratings.reduce((sum: any, r: { rating: any; }) => sum + r.rating, 0) / ratings.length;
+          ratings.reduce((sum: any, r: { rating: any }) => sum + r.rating, 0) /
+          ratings.length;
 
         return { averageRating, totalRatings: ratings.length };
       } catch (error) {
@@ -78,4 +80,35 @@ export const postRatingRouter = t.router({
         });
       }
     }),
+
+  getMostRatedPostByCategory: t.procedure.query(async ({ ctx }) => {
+    try {
+      const topRatedPosts = await ctx.prisma.post.groupBy({
+        by: ["categoria"], // Agrupar por categoría
+        _max: {
+          avgRating: true, // Obtener el mayor avgRating en cada categoría
+        },
+      });
+
+      // Obtener los posts completos con el max avgRating en cada categoría
+      const mostRatedPosts = await Promise.all(
+        topRatedPosts.map(async (group) => {
+          return ctx.prisma.post.findFirst({
+            where: {
+              categoria: group.categoria,
+              avgRating: group._max.avgRating!,
+            },
+          });
+        })
+      );
+
+      return mostRatedPosts;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Error fetching top-rated posts by category",
+        cause: error,
+      });
+    }
+  }),
 });

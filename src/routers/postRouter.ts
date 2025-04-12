@@ -10,6 +10,8 @@ export const postRouter = t.router({
     .input(createPostSchema)
     .mutation(async ({ input, ctx }) => {
       try {
+        console.log("Recibido en backend:", input); // <-- esto
+
         return await ctx.prisma.post.create({
           data: {
             titulo: input.titulo,
@@ -44,23 +46,23 @@ export const postRouter = t.router({
   }),
 
   getAllLimit: t.procedure
-  .input(z.number().optional()) // Cambiamos a z.number().optional()
-  .query(async ({ ctx, input }) => {
-    try {
-      return await ctx.prisma.post.findMany({
-        take: input || undefined, // Usamos directamente el número como límite
-        orderBy: {
-          createdAt: "desc", // Ordena por fecha descendente
-        },
-      });
-    } catch (error) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Error al obtener los posts.",
-        cause: error,
-      });
-    }
-  }),
+    .input(z.number().optional()) // Cambiamos a z.number().optional()
+    .query(async ({ ctx, input }) => {
+      try {
+        return await ctx.prisma.post.findMany({
+          take: input || undefined, // Usamos directamente el número como límite
+          orderBy: {
+            createdAt: "desc", // Ordena por fecha descendente
+          },
+        });
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al obtener los posts.",
+          cause: error,
+        });
+      }
+    }),
 
   // Obtener un post por su ID
   getById: t.procedure.input(z.number()).query(async ({ input, ctx }) => {
