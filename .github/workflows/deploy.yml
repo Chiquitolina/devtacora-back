@@ -3,7 +3,7 @@ name: Deploy Node Backend to VPS
 on:
   push:
     branches:
-      - master  # o main, según tu repositorio
+      - master
 
 jobs:
   build-and-deploy:
@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Compile TypeScript
-        run: npx tsc  # Asegurate de tener instalado typescript como dependencia
+        run: npx tsc
 
       - name: Add SSH key
         run: |
@@ -33,15 +33,15 @@ jobs:
       - name: Deploy backend files via rsync
         run: |
           rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
-          dist/ root@149.50.150.50:/var/www/devtacora-backend/dist/
+          dist/ root@149.50.150.50:/var/www/devtacora-back/dist/
           rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
-          package.json root@149.50.150.50:/var/www/devtacora-backend/
+          package.json root@149.50.150.50:/var/www/devtacora-back/
           rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
-          ecosystem.config.js root@149.50.150.50:/var/www/devtacora-backend/
+          ecosystem.config.js root@149.50.150.50:/var/www/devtacora-back/
 
       - name: Restart PM2 process
         run: |
           ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507 root@149.50.150.50 "
-            cd /var/www/devtacora-backend &&
+            cd /var/www/devtacora-back &&
             pm2 reload ecosystem.config.js
           "
