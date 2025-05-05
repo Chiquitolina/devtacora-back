@@ -1,0 +1,47 @@
+name: Deploy Node Backend to VPS
+
+on:
+  push:
+    branches:
+      - master  # o main, según tu repositorio
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Compile TypeScript
+        run: npx tsc  # Asegurate de tener instalado typescript como dependencia
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/ci_deploy_key
+          chmod 600 ~/.ssh/ci_deploy_key
+
+      - name: Deploy backend files via rsync
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
+          dist/ root@149.50.150.50:/var/www/devtacora-backend/dist/
+          rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
+          package.json root@149.50.150.50:/var/www/devtacora-backend/
+          rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
+          ecosystem.config.js root@149.50.150.50:/var/www/devtacora-backend/
+
+      - name: Restart PM2 process
+        run: |
+          ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507 root@149.50.150.50 "
+            cd /var/www/devtacora-backend &&
+            pm2 reload ecosystem.config.js
+          "
