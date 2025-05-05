@@ -92,7 +92,7 @@ export const postRatingRouter = t.router({
 
       // Obtener los posts completos con el max avgRating en cada categoría
       const mostRatedPosts = await Promise.all(
-        topRatedPosts.map(async (group) => {
+        topRatedPosts.map(async (group: any) => {
           return ctx.prisma.post.findFirst({
             where: {
               categoria: group.categoria,
