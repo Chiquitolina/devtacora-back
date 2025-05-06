@@ -6,6 +6,8 @@ import { createContext } from "./config/tRCP";
 import { appRouter } from "./config/appRouter";
 
 const app = express();
+app.set("trust proxy", true);
+
 const PORT = process.env.PORT || 3000;
 
 //app.use(morgan("dev"));
