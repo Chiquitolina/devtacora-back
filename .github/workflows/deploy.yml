@@ -1,9 +1,9 @@
-name: Deploy Node Backend to VPS
+name: Deploy Node Backend to DEV
 
 on:
   push:
     branches:
-      - master
+      - dev # Cambiamos a rama dev
 
 jobs:
   build-and-deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
         run: npm install
@@ -33,15 +33,15 @@ jobs:
       - name: Deploy backend files via rsync
         run: |
           rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
-          dist/ root@149.50.150.50:/var/www/devtacora-back/dist/
+          dist/ root@149.50.150.50:/var/www/devtacora-dev/dist/
           rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
-          package.json root@149.50.150.50:/var/www/devtacora-back/
+          package.json root@149.50.150.50:/var/www/devtacora-dev/
           rsync -avz -e "ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507" \
-          ecosystem.config.js root@149.50.150.50:/var/www/devtacora-back/
+          ecosystem.config.js root@149.50.150.50:/var/www/devtacora-dev/
 
       - name: Restart PM2 process
         run: |
           ssh -i ~/.ssh/ci_deploy_key -o StrictHostKeyChecking=no -p5507 root@149.50.150.50 "
-            cd /var/www/devtacora-back &&
+            cd /var/www/devtacora-dev &&
             pm2 reload ecosystem.config.js
           "
