@@ -14,11 +14,10 @@ const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
   origin: [
-    "http://localhost:3000",
+    "http://localhost:3001",
     "http://localhost:4200",
-    "https://vps-4866955-x.dattaweb.com/",
-    "https://devtacora.com.ar",
-    "https://www.devtacora.com.ar",
+    "https://dev.devtacora.com.ar",
+    "https://www.dev.devtacora.com.ar",
   ],
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization",
